@@ -1,0 +1,1 @@
+gcc main.c monitor.c -o main -pthread
