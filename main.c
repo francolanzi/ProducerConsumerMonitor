@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "monitor.h"
-#include <string.h>
 
 #define MAX 1000
 
