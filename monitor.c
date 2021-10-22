@@ -1,26 +1,9 @@
 #include <pthread.h>
 #include "monitor.h"
 
-#define N 100
-
-int buffer[N];
-int size = 0;
-
-void insert_elem(int elem) {
-  buffer[size++] = elem;
-}
-
-int remove_elem() {
-  int elem = buffer[0];
-  size--;
-  for(int i = 0; i < size; i++) {
-    buffer[i] = buffer[i + 1];
-  }
-  return elem;
-}
-
 void init_monitor(monitor_t *monitor) {
   monitor->count = 0;
+  buffer_init(&monitor->buffer);
   pthread_cond_init(&monitor->empty, NULL);
   pthread_cond_init(&monitor->full, NULL);
   pthread_mutex_init(&monitor->mutex, NULL);
@@ -32,12 +15,12 @@ void destroy_monitor(monitor_t *monitor) {
   pthread_mutex_destroy(&monitor->mutex);
 }
 
-void insertion(monitor_t *monitor, int elem) {
+void insertion(monitor_t *monitor, int value) {
   pthread_mutex_lock(&monitor->mutex);
-  if (monitor->count == N) {
+  if (monitor->count == BUFF_SIZE) {
     pthread_cond_wait(&monitor->full, &monitor->mutex);
   }
-  insert_elem(elem);
+  buffer_insert(&monitor->buffer, value);
   monitor->count++;
   if (monitor->count == 1) {
     pthread_cond_signal(&monitor->empty);
@@ -50,11 +33,11 @@ int removal(monitor_t *monitor) {
   if (monitor->count == 0) {
     pthread_cond_wait(&monitor->empty, &monitor->mutex);
   }
-  int elem = remove_elem();
+  int value = buffer_remove(&monitor->buffer);
   monitor->count--;
-  if (monitor->count == N - 1) {
+  if (monitor->count == BUFF_SIZE - 1) {
     pthread_cond_signal(&monitor->full);
   }
   pthread_mutex_unlock(&monitor->mutex);
-  return elem;
+  return value;
 }

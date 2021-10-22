@@ -1,1 +1,1 @@
-gcc main.c monitor.c -o main -pthread
+gcc buffer.c monitor.c main.c -o main -pthread

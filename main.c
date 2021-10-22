@@ -12,17 +12,17 @@ int produce() {
   return rand() % 10;
 }
 
-void consume(int elem) {
+void consume(int value) {
   sleep(1);
-  printf("%d ", elem);
+  printf("%d ", value);
   fflush(stdout);
 }
 
 void *producer(void *arg) {
   monitor_t *monitor = (monitor_t *) arg;
   for (int i = 0; i < MAX; i++) {
-    int elem = produce();
-    insertion(monitor, elem);
+    int value = produce();
+    insertion(monitor, value);
   }
   pthread_exit(NULL);
 }
@@ -30,8 +30,8 @@ void *producer(void *arg) {
 void *consumer(void *arg) {
   monitor_t *monitor = (monitor_t *) arg;
   for (int i = 0; i < MAX; i++) {
-    int elem = removal(monitor);
-    consume(elem);
+    int value = removal(monitor);
+    consume(value);
   }
   pthread_exit(NULL);
 }
